@@ -1,4 +1,6 @@
 import * as React from 'react';
+
+/*
 import { Hello, HowAreYou, Mood, TickTock, News, CountUp, SimpleReduxTester, SimpleReduxActTester, CompleteReactReduxTester } from '../components/';
 
 const content = (
@@ -12,6 +14,16 @@ const content = (
     <SimpleReduxTester />
     <SimpleReduxActTester />
     <CompleteReactReduxTester />
+  </div>
+);
+*/
+
+import { MySqlConnectionTest } from '../components/';
+
+const content = (
+  <div id="container">
+    <h2>Welcome to MySQL with Typescript, React and Electron!</h2>
+    <MySqlConnectionTest />
   </div>
 );
 

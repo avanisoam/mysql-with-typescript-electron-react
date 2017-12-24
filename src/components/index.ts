@@ -8,4 +8,6 @@ import SimpleReduxActTester from './SimpleReduxActTester';
 import CompleteReactReduxTester from './CompleteReactReduxTester';
 import { Mood } from './HowAreYou';
 
-export { Hello, HowAreYou, Mood, TickTock, News, CountUp, SimpleReduxTester, SimpleReduxActTester, CompleteReactReduxTester };
+import MySqlConnectionTest from './MySqlConnectionTest';
+
+export { Hello, HowAreYou, Mood, TickTock, News, CountUp, SimpleReduxTester, SimpleReduxActTester, CompleteReactReduxTester, MySqlConnectionTest };
