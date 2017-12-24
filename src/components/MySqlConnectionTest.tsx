@@ -71,7 +71,7 @@ class Hello extends React.Component<ComponentProperties, ComponentState> {
           </label>
           <br/>
           <br/>
-          <input type='submit' value='Submit' />
+          <input type='submit' value='Test Connection' />
         </form>
       </div>
     );

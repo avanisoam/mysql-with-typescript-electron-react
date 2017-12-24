@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="styles/App-styles.less" />  
+</head>
+<body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 0" >
+  <br/>
+  We are using node <script>document.write(process.versions.node)</script>,
+  Chrome <script>document.write(process.versions.chrome)</script>,
+  and Electron <script>document.write(process.versions.electron)</script>.
+
+  <div id="App"></div>
+  
+  <br/>
+  <form action="http://localhost:8888/fileupload" method="post" enctype="multipart/form-data">
+    <input type="file" name="filetoupload" />
+    <br/>
+    <input type="submit" value="Test Upload" />
+  </form>
+
+</body>
+
+<script>window.exports = module.exports</script>
+<script type="text/tsx">
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { AppContainer } from 'react-hot-loader';
+import { Provider } from 'react-redux';
+
+import { store } from './store';
+
+let render = () => {
+  const { App } = require('./app/app');
+  ReactDOM.render(
+    (<AppContainer>
+      <Provider store={store}><App /></Provider>
+    </AppContainer>), document.getElementById('App'));
+}
+
+render();
+if (module.hot) { module.hot.accept(render); }
+</script>
+</html>
