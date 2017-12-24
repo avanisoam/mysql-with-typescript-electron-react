@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="styles/App-styles.less" />  
+</head>
+<body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 0" >
+  <div id="App"></div>
+</body>
+
+<script>window.exports = module.exports</script>
+<script type="text/tsx">
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { AppContainer } from 'react-hot-loader';
+import { Provider } from 'react-redux';
+
+import { store } from './store';
+
+let render = () => {
+  const { App } = require('./app/app');
+  ReactDOM.render(
+    (<AppContainer>
+      <Provider store={store}><App /></Provider>
+    </AppContainer>), document.getElementById('App'));
+}
+
+render();
+if (module.hot) { module.hot.accept(render); }
+</script>
+</html>
