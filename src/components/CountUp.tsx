@@ -54,7 +54,7 @@ class CountUp extends React.Component<ComponentProperties, ComponentState> {
 
   getOption(isSelected: boolean, value: number, text: string): JSX.Element {
     return isSelected ? (
-      <option key={value} selected value={value}>
+      <option key={value} value={value}>
         {text}
       </option>
     ) : (
