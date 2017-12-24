@@ -9,5 +9,8 @@ import CompleteReactReduxTester from './CompleteReactReduxTester';
 import { Mood } from './HowAreYou';
 
 import MySqlConnectionTest from './MySqlConnectionTest';
+import MySqlSelectTest from './MySqlSelectTest';
 
-export { Hello, HowAreYou, Mood, TickTock, News, CountUp, SimpleReduxTester, SimpleReduxActTester, CompleteReactReduxTester, MySqlConnectionTest };
+export { Hello, HowAreYou, Mood, TickTock, News, CountUp, 
+    SimpleReduxTester, SimpleReduxActTester, CompleteReactReduxTester, 
+    MySqlConnectionTest, MySqlSelectTest };

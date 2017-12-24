@@ -18,12 +18,14 @@ const content = (
 );
 */
 
-import { MySqlConnectionTest } from '../components/';
+import { MySqlConnectionTest, MySqlSelectTest } from '../components/';
 
 const content = (
   <div id="container">
     <h2>Welcome to MySQL with Typescript, React and Electron!</h2>
     <MySqlConnectionTest />
+    <br />
+    <MySqlSelectTest />
   </div>
 );
 
