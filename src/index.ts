@@ -2,6 +2,10 @@ import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { enableLiveReload } from 'electron-compile';
 
+// https://ourcodeworld.com/articles/read/524/how-to-use-live-reload-in-your-electron-project
+// Enable live reload for all the files inside your project directory
+require('electron-reload')(__dirname);
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow | null = null;
@@ -21,6 +25,7 @@ const createWindow = async () => {
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`);
+  //mainWindow.loadURL(`file://${__dirname}/fileCRUD.html`);
 
   // Open the DevTools.
   if (isDevMode) {

@@ -4,8 +4,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" href="styles/App-styles.less" />  
 </head>
-<body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 0" >
+<body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 5" >
+    <br/>
+    We are using node <script>document.write(process.versions.node)</script>,
+    Chrome <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>.
+
   <div id="App"></div>
+  
+  <br/>
+  <input type="button" id="btn-createnewfile" value="Create New file" />
+  <br/>
+
+  <script>
+    // https://ourcodeworld.com/articles/read/106/how-to-choose-read-save-delete-or-create-a-file-with-electron-framework
+    var fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
+    const {dialog} = require('electron').remote;  
+
+    document.getElementById("btn-createnewfile").addEventListener("click", () => {
+      let content = "Some text to save into the file";
+
+      // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
+      dialog.showSaveDialog((fileName) => {
+          if (fileName === undefined){
+              console.log("You didn't save the file");
+              return;
+          }
+
+          // fileName is a string that contains the path and filename created in the save file dialog.  
+          fs.writeFile(fileName, content, (err) => {
+              if(err){
+                  alert("An error ocurred creating the file "+ err.message)
+              }
+                          
+              alert("The file has been succesfully saved");
+          });
+      }); 
+
+    }, false);
+
+  </script>
+
+  <br/>
+
 </body>
 
 <script>window.exports = module.exports</script>
