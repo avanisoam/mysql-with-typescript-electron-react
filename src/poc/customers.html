@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!--link rel="stylesheet" href="styles/App-styles.less" /-->
+    <link rel="stylesheet" href="../styles/App-styles.less" />
+</head>
+
+<body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 5">
+    <br/> We are using node
+    <script>
+        document.write(process.versions.node)
+    </script>, Chrome
+    <script>
+        document.write(process.versions.chrome)
+    </script>, and Electron
+    <script>
+        document.write(process.versions.electron)
+    </script>.
+
+    <div id="App"></div>
+    <br/>
+    <input type="text" placeholder="Please select a file" id="actual-file" disabled="disabled" />
+    <input type="button" id="btn-readcsvfile" value="Read CSV file" />
+
+    <br/>
+
+    
+    <script>
+        var fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
+        // http://papaparse.com/
+        var Papa = require('papaparse');
+        // https://www.npmjs.com/package/string-format
+        var format = require('string-format');
+        // https://github.com/kripken/sql.js
+        var sql = require('sql.js');
+
+        const { dialog } = require('electron').remote;
+
+        var filedata = '';
+
+        document.getElementById("btn-readcsvfile").addEventListener("click", () => {
+            dialog.showOpenDialog(function(fileNames) {
+                if (fileNames === undefined) {
+                    console.log("No file selected");
+                } else {
+                    document.getElementById("actual-file").value = fileNames[0];
+
+                    filedata = '';                   
+
+                    Papa.parse(fileNames[0], {
+                        download: true,
+                        step: function(row) {
+                            console.log("Row:", row.data);
+                            if (row.data[0][0] != '') {
+                                filedata = filedata + format("INSERT INTO `member_index` (`id`, `type`, `pincode`, `email`, `phone`, `otp`, `verified`, `fee`, `remark`, `creation_time`) VALUES (NULL, 'V', '{}', '{}', '{}', '1234', '0', '0.00', '{}', CURRENT_TIMESTAMP); \r\n",
+                                    row.data[0][6], row.data[0][8], row.data[0][7], row.data[0][0]);
+                            }
+                        },
+                        complete: function() {
+                            console.log("All done!");
+                            fs.writeFile(fileNames[0] + '_member_index.sql', filedata, (err) => {
+                                if (err) {
+                                    alert("An error ocurred creating the file " + err.message)
+                                }
+
+                                alert("The file has been succesfully saved");
+
+                                var db = new sql.Database();
+
+                                // Execute some sql
+                                sqlstr = "CREATE TABLE `member_index` (`id` int, `type` char, `pincode` VARCHAR(255), `email` VARCHAR(255), `phone` VARCHAR(255), `otp` VARCHAR(255), `verified` VARCHAR(255), `fee` VARCHAR(255), `remark` VARCHAR(255), `creation_time` VARCHAR(255));";
+                                sqlstr += filedata;
+                                console.log(sqlstr);
+                                db.run(sqlstr); // Run the query without returning anything
+
+                                var res = db.exec("SELECT * FROM member_index");
+                                
+                                console.log(res);
+
+                                var binaryArray = db.export();
+
+                                var buffer = new Buffer(binaryArray);
+                                fs.writeFileSync("D:\\2018\\filename.sqlite", buffer);
+                            });
+                        }
+                    });
+                }
+            });
+
+        }, false);
+
+    </script>
+    
+    <br/>
+
+</body>
+
+<script>window.exports = module.exports</script>
+<script type="text/tsx">
+    import * as React from 'react';
+    import * as ReactDOM from 'react-dom';
+    import { AppContainer } from 'react-hot-loader';
+    import { Provider } from 'react-redux';
+
+    import { store } from '../store';
+
+    let render = () => {
+        const { App } = require('../app/app');
+        ReactDOM.render(
+            (<AppContainer>
+            <Provider store={store}><App /></Provider>
+            </AppContainer>), 
+            document.getElementById('App'));
+    }
+
+    //render();
+    if (module.hot) { module.hot.accept(render); }
+</script>
+</html>
