@@ -23,9 +23,15 @@
     <br/>
     <input type="button" id="btn-createnewfile" value="Create New file" />
     <br/>
+    <br>
+    Enter max member_index from table: <input type="text" id="txt-maxindex" value="" />
+    <br>
     <input type="text" placeholder="Please select a file" id="actual-file" disabled="disabled" />
     <input type="button" id="btn-readcsvfile" value="Read CSV file" />
-    <br>
+    <br/>
+    <br/>
+    SELECT `id`, `email`, `remark` FROM `member_index` WHERE `id` > <label id="lbl-maxindex">0</label>
+    <br/>
     <br>
     <textarea id="content-editor" rows="5"></textarea>
     <br>
@@ -86,7 +92,8 @@
                         },
                         complete: function() {
                             console.log("All done!");
-                            fs.writeFile('d:/filepath/1.sql', filedata, (err) => {
+                            //fs.writeFile('d:/filepath/1.sql', filedata, (err) => {
+                            fs.writeFile(fileNames[0] + '_member_index.sql', filedata, (err) => {
                                 if (err) {
                                     alert("An error ocurred creating the file " + err.message)
                                 }
