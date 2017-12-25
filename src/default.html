@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="styles/App-styles.less" />
+</head>
+
+<body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 5">
+    <br/> We are using node
+    <script>
+        document.write(process.versions.node)
+    </script>, Chrome
+    <script>
+        document.write(process.versions.chrome)
+    </script>, and Electron
+    <script>
+        document.write(process.versions.electron)
+    </script>.
+
+    <div id="App"></div>
+
+    <br/>
+    <input type="button" id="btn-createnewfile" value="Create New file" />
+    <br/>
+    <input type="text" placeholder="Please select a file" id="actual-file" disabled="disabled" />
+    <input type="button" id="btn-readcsvfile" value="Read CSV file" />
+    <br>
+    <br>
+    <textarea id="content-editor" rows="5"></textarea>
+    <br>
+    <br>
+    <script>
+        // https://ourcodeworld.com/articles/read/106/how-to-choose-read-save-delete-or-create-a-file-with-electron-framework
+        var fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
+        const {
+            dialog
+        } = require('electron').remote;
+
+        document.getElementById("btn-createnewfile").addEventListener("click", () => {
+            let content = "Some text to save into the file";
+
+            // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
+            dialog.showSaveDialog((fileName) => {
+                if (fileName === undefined) {
+                    console.log("You didn't save the file");
+                    return;
+                }
+
+                // fileName is a string that contains the path and filename created in the save file dialog.  
+                fs.writeFile(fileName, content, (err) => {
+                    if (err) {
+                        alert("An error ocurred creating the file " + err.message)
+                    }
+
+                    alert("The file has been succesfully saved");
+                });
+            });
+
+        }, false);
+
+        document.getElementById("btn-readcsvfile").addEventListener("click", () => {
+            dialog.showOpenDialog(function(fileNames) {
+                if (fileNames === undefined) {
+                    console.log("No file selected");
+                } else {
+                    document.getElementById("actual-file").value = fileNames[0];
+                    //readFile(fileNames[0]);
+
+                    // http://papaparse.com/
+                    var Papa = require('papaparse');
+                    var filedata = '';
+
+                    // https://www.npmjs.com/package/string-format
+                    var format = require('string-format')
+
+                    Papa.parse(fileNames[0], {
+                        download: true,
+                        step: function(row) {
+                            console.log("Row:", row.data);
+                            //filedata = filedata + format('Hello, {}! \r\n', row.data[0][0]);
+                            if (row.data[0][0] != '') {
+                                filedata = filedata + format("INSERT INTO `member_index` (`id`, `type`, `pincode`, `email`, `phone`, `otp`, `verified`, `fee`, `remark`, `creation_time`) VALUES (NULL, 'V', '{}', '{}', '{}', '1234', b'0', '0.00', '{}', CURRENT_TIMESTAMP); \r\n",
+                                    row.data[0][6], row.data[0][8], row.data[0][7], row.data[0][0]);
+                            }
+                        },
+                        complete: function() {
+                            console.log("All done!");
+                            fs.writeFile('d:/filepath/1.sql', filedata, (err) => {
+                                if (err) {
+                                    alert("An error ocurred creating the file " + err.message)
+                                }
+
+                                alert("The file has been succesfully saved");
+                            });
+                        }
+                    });
+
+                    /*
+                    Papa.parse(fileNames[0], {
+                      complete: function(results) {
+                        console.log(results);
+                      }
+                    });
+                    */
+                }
+            });
+
+        }, false);
+
+        function readFile(filepath) {
+            fs.readFile(filepath, 'utf-8', function(err, data) {
+                if (err) {
+                    alert("An error ocurred reading the file :" + err.message);
+                    return;
+                }
+
+                document.getElementById("content-editor").value = data;
+            });
+        }
+    </script>
+
+    <br/>
+
+</body>
+
+<script>window.exports = module.exports</script>
+<script type="text/tsx">
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { AppContainer } from 'react-hot-loader';
+import { Provider } from 'react-redux';
+
+import { store } from './store';
+
+let render = () => {
+  const { App } = require('./app/app');
+  ReactDOM.render(
+    (<AppContainer>
+      <Provider store={store}><App /></Provider>
+    </AppContainer>), document.getElementById('App'));
+}
+
+render();
+if (module.hot) { module.hot.accept(render); }
+</script>
+</html>
