@@ -26,6 +26,9 @@ const createWindow = async () => {
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`);
   //mainWindow.loadURL(`file://${__dirname}/fileCRUD.html`);
+  //mainWindow.loadURL(`file://${__dirname}/default.html`);
+  //mainWindow.loadURL(`file://${__dirname}/sqljs.html`);
+  //mainWindow.loadURL(`file://${__dirname}/sqljs.1.html`);
 
   // Open the DevTools.
   if (isDevMode) {
