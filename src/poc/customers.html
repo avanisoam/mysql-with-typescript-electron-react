@@ -20,6 +20,7 @@
     </script>.
 
     <div id="App"></div>
+    https://sqliteonline.com/
     <br/>
     <input type="text" placeholder="Please select a file" id="actual-file" disabled="disabled" />
     <input type="button" id="btn-readcsvfile" value="Read CSV file" />
@@ -27,7 +28,12 @@
     <br/>
     <input type="text" placeholder="Please select a file" id="x-file" disabled="disabled" />
     <input type="button" id="btn-readxcsvfile" value="Read x CSV file" />
-
+    <br/>
+    <br/>
+    <input type="button" id="btn-mergefile" value="Merge files" />
+    <br/>
+    <br/>
+    <input type="button" id="btn-generatefiles" value="Generate files" />
     <br/>
 
     
@@ -45,6 +51,82 @@
         var tempdir = '';
         var filedata = '';
         var dbpath = '';
+
+        document.getElementById("btn-generatefiles").addEventListener("click", () => {
+
+            var filebuffer = fs.readFileSync(dbpath);
+            // Load the db
+            var db = new sql.Database(filebuffer);
+
+            //var res = db.exec("SELECT * FROM newuser; SELECT * FROM member_index; SELECT * FROM xuser; SELECT * FROM finaluser;");       
+            var res = db.exec("SELECT * FROM finaluser");
+            //console.log(res[0].columns);
+            //console.log(res[0].values);
+
+            var finalsql_customers = '';
+            var finalsql_vleinfo = '';
+            var finalsql_customers_wallet = '';
+
+            var arrayLength = res[0].values.length;
+            for (var i = 0; i < arrayLength; i++) {
+                //console.log(res[0].values[i]);
+                //Do something
+
+                finalsql_customers += format("INSERT INTO `customers` (`id`, `vle_code`, `firstname`, `lastname`, `email`, `email_subscribe`, `phone`, `company`, `password`, `active`, `group_id`,`profile_id`, `confirmed`, `is_guest`, `is_wlc`, `owner_id`) VALUES (NULL, 'KA000{}28', '{}','# ','{}','0','{}', 'xyz_KA', '7c4a8d09ca3762af61e59520943dc26494f8941b', '0', '1', '1', '0', '0', '0', '1'); \r\n",
+                res[0].values[i][0],res[0].values[i][3],res[0].values[i][9],res[0].values[i][8]);
+
+                finalsql_vleinfo += format("INSERT INTO `vleinfo` (`id`, `customerid`, `state_name`, `district_name`, `division`, `block`, `village_code`, `village_name`, `enterpreneur_name`,`gender`,`location`, `pincode`, `std_code`, `address`, `pan_card`, `aadhaar`) VALUES ({}, {}, 'KARNATAKA', '{}', '', '', '', '', '', 'Male', 'KA',{}, 0, 'Sre', '{}', '{}'); \r\n",
+                res[0].values[i][0], res[0].values[i][0], res[0].values[i][5],res[0].values[i][7], res[0].values[i][10], res[0].values[i][11]);
+
+                finalsql_customers_wallet += format("INSERT INTO `customers_wallet` (`customerId`, `amount`, `approvedby`, `lastModifyTime`, `guid`) VALUES ({}, 0.00, 0, CURRENT_TIMESTAMP, 'A6AA6C7B-88B9-4A03-A904-4AB171432717'); \r\n",
+                res[0].values[i][0]);
+            }
+
+            fs.writeFile(tempdir + "/" + '_customers.sql', finalsql_customers, (err) => {
+                if (err) {
+                    alert("An error ocurred creating the file " + err.message)
+                }
+                console.log(tempdir + "/" + '_customers.sql file has been succesfully saved');
+                //alert("The file has been succesfully saved");
+            });
+
+            fs.writeFile(tempdir + "/" + '_vleinfo.sql', finalsql_vleinfo, (err) => {
+                if (err) {
+                    alert("An error ocurred creating the file " + err.message)
+                }
+                console.log(tempdir + "/" + '_vleinfo.sql file has been succesfully saved');
+                //alert("The file has been succesfully saved");
+            });
+
+            fs.writeFile(tempdir + "/" + '_customers_wallet.sql', finalsql_customers_wallet, (err) => {
+                if (err) {
+                    alert("An error ocurred creating the file " + err.message)
+                }
+                console.log(tempdir + "/" + '_customers_wallet.sql file has been succesfully saved');
+                //alert("The file has been succesfully saved");
+            });
+
+            console.log("Files Generated");
+        }, false);
+
+        document.getElementById("btn-mergefile").addEventListener("click", () => {
+
+            var filebuffer = fs.readFileSync(dbpath);
+            // Load the db
+            var db = new sql.Database(filebuffer);
+
+            var finalsqlstr = "CREATE TABLE `finaluser` (newId int, ID VARCHAR(255),xID VARCHAR(255),Name VARCHAR(255),Address VARCHAR(255),District VARCHAR(255),State VARCHAR(255),Pincode VARCHAR(255),	Mobile VARCHAR(255),Email VARCHAR(255),	PANNo VARCHAR(255),AadhaarNo VARCHAR(255),Status VARCHAR(255));";
+            finalsqlstr += "INSERT INTO 'finaluser' SELECT b.id as newId, a.* FROM 'newuser' a JOIN xuser b on a.ID = b.remark;"
+            //console.log(finalsqlstr);
+            db.run(finalsqlstr);
+
+            var binaryArray = db.export();
+            var buffer = new Buffer(binaryArray);
+            //dbpath = tempdir + "/" + "filename.sqlite";
+            fs.writeFileSync(dbpath, buffer);
+
+            console.log("Files Merged");
+        }, false);
 
         document.getElementById("btn-readxcsvfile").addEventListener("click", () => {
             dialog.showOpenDialog(function(fileNames) {
