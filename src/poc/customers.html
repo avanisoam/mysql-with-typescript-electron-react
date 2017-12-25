@@ -23,6 +23,10 @@
     <br/>
     <input type="text" placeholder="Please select a file" id="actual-file" disabled="disabled" />
     <input type="button" id="btn-readcsvfile" value="Read CSV file" />
+    <br/>
+    <br/>
+    <input type="text" placeholder="Please select a file" id="x-file" disabled="disabled" />
+    <input type="button" id="btn-readxcsvfile" value="Read x CSV file" />
 
     <br/>
 
@@ -38,7 +42,55 @@
 
         const { dialog } = require('electron').remote;
 
+        var tempdir = '';
         var filedata = '';
+        var dbpath = '';
+
+        document.getElementById("btn-readxcsvfile").addEventListener("click", () => {
+            dialog.showOpenDialog(function(fileNames) {
+                if (fileNames === undefined) {
+                    console.log("No file selected");
+                } else {
+                    document.getElementById("x-file").value = fileNames[0];
+
+                    var filebuffer = fs.readFileSync(dbpath);
+
+                    // Load the db
+                    var db = new sql.Database(filebuffer);
+
+                    sqlstr = "CREATE TABLE `xuser` (id int,email VARCHAR(255),remark VARCHAR(255));";
+                    //sqlstr += "INSERT INTO `xuser` (id,email,remark)  VALUES ('{}','{}','{}');";
+                    //console.log(sqlstr);
+                    db.run(sqlstr); // Run the query without returning anything
+
+                    Papa.parse(fileNames[0], {
+                        download: true,
+                        step: function(row) {
+                            //console.log("Row:", row.data);
+                            if (row.data[0][0] != '') {
+                                if (row.data[0][0] != 'id') {
+                                    var xuserdata = format("INSERT INTO `xuser` (id,email,remark)  VALUES ('{}','{}','{}'); \r\n",
+                                        row.data[0][0], row.data[0][1], row.data[0][2]);
+                                    //console.log(xuserdata);
+                                    db.run(xuserdata);
+                                }
+                            }
+                        },
+                        complete: function() {
+                            console.log("x All done!");
+
+                            var binaryArray = db.export();
+                            var buffer = new Buffer(binaryArray);
+                            //dbpath = tempdir + "/" + "filename.sqlite";
+                            fs.writeFileSync(dbpath, buffer);
+
+                            var res = db.exec("SELECT * FROM newuser; SELECT * FROM member_index; SELECT * FROM xuser;");       
+                            console.log(res);
+                        }
+                    }); 
+                }
+            });
+        }, false);
 
         document.getElementById("btn-readcsvfile").addEventListener("click", () => {
             dialog.showOpenDialog(function(fileNames) {
@@ -46,43 +98,64 @@
                     console.log("No file selected");
                 } else {
                     document.getElementById("actual-file").value = fileNames[0];
+                    // https://stackoverflow.com/questions/17192150/node-js-get-folder-path-from-a-file
+                    var onlyPath = require('path').dirname(fileNames[0]);
+                    console.log(onlyPath);
 
-                    filedata = '';                   
+                    tempdir = onlyPath + '/tmp';
+
+                    if (!fs.existsSync(tempdir)){
+                        fs.mkdirSync(tempdir);
+                    }
+
+                    filedata = '';                 
+                    
+                    var db = new sql.Database();
+
+                    sqlstr = "CREATE TABLE `newuser` (ID VARCHAR(255),xID VARCHAR(255),Name VARCHAR(255),Address VARCHAR(255),District VARCHAR(255),State VARCHAR(255),Pincode VARCHAR(255),	Mobile VARCHAR(255),Email VARCHAR(255),	PANNo VARCHAR(255),AadhaarNo VARCHAR(255),Status VARCHAR(255));";
+                    //console.log(sqlstr);
+                    db.run(sqlstr); // Run the query without returning anything
 
                     Papa.parse(fileNames[0], {
                         download: true,
                         step: function(row) {
-                            console.log("Row:", row.data);
+                            //console.log("Row:", row.data);
                             if (row.data[0][0] != '') {
+                                newuserdata = format("INSERT INTO `newuser` (ID,xID,Name,Address,District,State,Pincode,Mobile,Email,PANNo,AadhaarNo,Status) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}'); \r\n",
+                                    row.data[0][0], row.data[0][1], row.data[0][2], row.data[0][3],row.data[0][4], row.data[0][5], row.data[0][6], row.data[0][7],row.data[0][8], row.data[0][9], row.data[0][10], row.data[0][11]);
+                                //console.log(newuserdata);
+                                db.run(newuserdata);
+
                                 filedata = filedata + format("INSERT INTO `member_index` (`id`, `type`, `pincode`, `email`, `phone`, `otp`, `verified`, `fee`, `remark`, `creation_time`) VALUES (NULL, 'V', '{}', '{}', '{}', '1234', '0', '0.00', '{}', CURRENT_TIMESTAMP); \r\n",
                                     row.data[0][6], row.data[0][8], row.data[0][7], row.data[0][0]);
                             }
                         },
                         complete: function() {
                             console.log("All done!");
-                            fs.writeFile(fileNames[0] + '_member_index.sql', filedata, (err) => {
+                            var userFileName = require('path').basename(fileNames[0]);
+
+                            fs.writeFile(tempdir + "/" + userFileName + '_member_index.sql', filedata, (err) => {
                                 if (err) {
                                     alert("An error ocurred creating the file " + err.message)
                                 }
 
-                                alert("The file has been succesfully saved");
-
-                                var db = new sql.Database();
+                                //alert("The file has been succesfully saved");
 
                                 // Execute some sql
                                 sqlstr = "CREATE TABLE `member_index` (`id` int, `type` char, `pincode` VARCHAR(255), `email` VARCHAR(255), `phone` VARCHAR(255), `otp` VARCHAR(255), `verified` VARCHAR(255), `fee` VARCHAR(255), `remark` VARCHAR(255), `creation_time` VARCHAR(255));";
                                 sqlstr += filedata;
-                                console.log(sqlstr);
+                                //console.log(sqlstr);
                                 db.run(sqlstr); // Run the query without returning anything
 
-                                var res = db.exec("SELECT * FROM member_index");
+                                var res = db.exec("SELECT * FROM newuser; SELECT * FROM member_index;");
                                 
                                 console.log(res);
 
                                 var binaryArray = db.export();
 
                                 var buffer = new Buffer(binaryArray);
-                                fs.writeFileSync("D:\\2018\\filename.sqlite", buffer);
+                                dbpath = tempdir + "/" + "filename.sqlite";
+                                fs.writeFileSync(dbpath, buffer);
                             });
                         }
                     });
