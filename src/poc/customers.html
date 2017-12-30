@@ -72,11 +72,11 @@
                 //console.log(res[0].values[i]);
                 //Do something
 
-                finalsql_customers += format("INSERT INTO `customers` (`id`, `vle_code`, `firstname`, `lastname`, `email`, `email_subscribe`, `phone`, `company`, `password`, `active`, `group_id`,`profile_id`, `confirmed`, `is_guest`, `is_wlc`, `owner_id`) VALUES (NULL, 'KA000{}28', '{}','# ','{}','0','{}', 'xyz_KA', '7c4a8d09ca3762af61e59520943dc26494f8941b', '0', '1', '1', '0', '0', '0', '1'); \r\n",
-                res[0].values[i][0],res[0].values[i][3],res[0].values[i][9],res[0].values[i][8]);
+                finalsql_customers += format("INSERT INTO `customers` (`id`, `vle_code`, `firstname`, `lastname`, `email`, `email_subscribe`, `phone`, `company`, `password`, `active`, `group_id`,`profile_id`, `confirmed`, `is_guest`, `is_wlc`, `owner_id`) VALUES ({}, 'KA000{}28', '{}','# ','{}','0','{}', 'xyz_KA', '7c4a8d09ca3762af61e59520943dc26494f8941b', '0', '1', '1', '0', '0', '0', '1'); \r\n",
+                res[0].values[i][0],res[0].values[i][0],res[0].values[i][3],res[0].values[i][9],res[0].values[i][8]);
 
-                finalsql_vleinfo += format("INSERT INTO `vleinfo` (`id`, `customerid`, `state_name`, `district_name`, `division`, `block`, `village_code`, `village_name`, `enterpreneur_name`,`gender`,`location`, `pincode`, `std_code`, `address`, `pan_card`, `aadhaar`) VALUES ({}, {}, 'KARNATAKA', '{}', '', '', '', '', '', 'Male', 'KA',{}, 0, 'Sre', '{}', '{}'); \r\n",
-                res[0].values[i][0], res[0].values[i][0], res[0].values[i][5],res[0].values[i][7], res[0].values[i][10], res[0].values[i][11]);
+                finalsql_vleinfo += format("INSERT INTO `vleinfo` (`id`, `customerid`, `state_name`, `district_name`, `division`, `block`, `village_code`, `village_name`, `enterpreneur_name`,`gender`,`location`, `pincode`, `std_code`, `address`, `pan_card`, `aadhaar`) VALUES ({}, {}, 'KARNATAKA', '{}', '', '', '', '', '', 'Male', 'KA',{}, 0, '{}', '{}', '{}'); \r\n",
+                res[0].values[i][0], res[0].values[i][0], res[0].values[i][5],res[0].values[i][7], res[0].values[i][4], res[0].values[i][10], res[0].values[i][11]);
 
                 finalsql_customers_wallet += format("INSERT INTO `customers_wallet` (`customerId`, `amount`, `approvedby`, `lastModifyTime`, `guid`) VALUES ({}, 0.00, 0, CURRENT_TIMESTAMP, 'A6AA6C7B-88B9-4A03-A904-4AB171432717'); \r\n",
                 res[0].values[i][0]);
